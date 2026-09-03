@@ -6,11 +6,12 @@ import (
 
 // LibraryController es el controlador principal que orquesta la transición entre vistas y eventos.
 type LibraryController struct {
-	router    *view.AppRouter
-	authCtrl  *AuthController
-	userCtrl  *UserController
-	loginView *view.LoginView
-	mainMenu  *view.MainMenuView
+	router       *view.AppRouter
+	authCtrl     *AuthController
+	userCtrl     *UserController
+	materialCtrl *MaterialController
+	loginView    *view.LoginView
+	mainMenu     *view.MainMenuView
 }
 
 // NewLibraryController crea el controlador principal e instala los escuchadores de navegación.
@@ -38,6 +39,11 @@ func (lc *LibraryController) SetUserController(userCtrl *UserController) {
 	lc.userCtrl = userCtrl
 }
 
+// SetMaterialController asigna la referencia al controlador de gestión de materiales.
+func (lc *LibraryController) SetMaterialController(materialCtrl *MaterialController) {
+	lc.materialCtrl = materialCtrl
+}
+
 // setupListeners configura los callbacks de eventos de las distintas vistas.
 func (lc *LibraryController) setupListeners() {
 	if lc.loginView != nil {
@@ -57,6 +63,8 @@ func (lc *LibraryController) setupListeners() {
 				lc.handleLogout()
 			case "Gestionar Usuarios":
 				lc.handleGestionUsuarios()
+			case "Gestionar Materiales":
+				lc.handleGestionMateriales()
 			default:
 				lc.router.MostrarModalError("El módulo [" + opc + "] está en desarrollo.")
 			}
@@ -97,6 +105,15 @@ func (lc *LibraryController) handleGestionUsuarios() {
 		}
 	} else {
 		lc.router.MostrarModalError("Acceso Denegado: Únicamente el Administrador puede gestionar usuarios.")
+	}
+}
+
+// handleGestionMateriales permite a los usuarios con rol adecuado ingresar a la gestión de inventario.
+func (lc *LibraryController) handleGestionMateriales() {
+	if lc.materialCtrl != nil {
+		lc.materialCtrl.MostrarInventario()
+	} else {
+		lc.router.MostrarModalError("Módulo de materiales no inicializado.")
 	}
 }
 
