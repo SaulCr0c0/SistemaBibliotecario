@@ -42,12 +42,14 @@ func (u *Usuario) GetPassword() string {
 
 // ObtenerDetalle retorna una representación formateada de los atributos específicos del rol.
 func (u *Usuario) ObtenerDetalle() string {
-	if u.Rol == "Administrador" {
+	switch u.Rol {
+	case "Administrador":
 		return fmt.Sprintf("Nivel Acceso: %d", u.NivelAcceso)
-	} else if u.Rol == "Bibliotecario" {
+	case "Bibliotecario":
 		return fmt.Sprintf("Turno: %s", u.Turno)
+	default:
+		return "-"
 	}
-	return "-"
 }
 
 // Administrador representa un usuario con privilegios administrativos.

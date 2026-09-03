@@ -3,7 +3,8 @@ package view
 import (
 	"strconv"
 
-	"biblioteca/Model"
+	model "biblioteca/Model"
+
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )
@@ -35,13 +36,13 @@ func NewUserTableView() *UserTableView {
 		SetTitleColor(tcell.ColorYellow).
 		SetTitleAlign(tview.AlignCenter)
 
-	btnNuevo := tview.NewButton(" [A] Agregar ").SetSelectedFunc(func() {
+	btnNuevo := tview.NewButton(" [[A]A] Agregar ").SetSelectedFunc(func() {
 		if utv.onNuevo != nil {
 			utv.onNuevo()
 		}
 	})
 
-	btnEditar := tview.NewButton(" [E] Editar ").SetSelectedFunc(func() {
+	btnEditar := tview.NewButton(" [[E]E] Editar ").SetSelectedFunc(func() {
 		if utv.onEditar != nil {
 			id := utv.ObtenerIDSeleccionado()
 			if id > 0 {
@@ -50,7 +51,7 @@ func NewUserTableView() *UserTableView {
 		}
 	})
 
-	btnEliminar := tview.NewButton(" [D] Eliminar ").SetSelectedFunc(func() {
+	btnEliminar := tview.NewButton(" [[D]D] Eliminar ").SetSelectedFunc(func() {
 		if utv.onEliminar != nil {
 			id := utv.ObtenerIDSeleccionado()
 			if id > 0 {
@@ -59,7 +60,7 @@ func NewUserTableView() *UserTableView {
 		}
 	})
 
-	btnVolver := tview.NewButton(" [V] Volver ").SetSelectedFunc(func() {
+	btnVolver := tview.NewButton(" [[V]V] Volver ").SetSelectedFunc(func() {
 		if utv.onVolver != nil {
 			utv.onVolver()
 		}
