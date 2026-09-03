@@ -1,11 +1,10 @@
 package main
 
 import (
+	controller "biblioteca/Controller"
+	model "biblioteca/Model"
+	view "biblioteca/View"
 	"log"
-
-	"biblioteca/Controller"
-	"biblioteca/Model"
-	"biblioteca/View"
 )
 
 func main() {
@@ -29,7 +28,8 @@ func main() {
 	router.AgregarPantalla("main_menu", mainMenuView.GetPrimitive())
 
 	// 3. Inicializar Capa Controlador
-	_ = controller.NewAuthController(userMgr, loginView, router, mainMenuView)
+	authCtrl := controller.NewAuthController(userMgr)
+	_ = controller.NewLibraryController(router, authCtrl, loginView, mainMenuView)
 
 	// 4. Ejecutar aplicación tview iniciando en la pantalla de login
 	if err := router.Run("login"); err != nil {

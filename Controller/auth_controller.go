@@ -2,82 +2,31 @@ package controller
 
 import (
 	"biblioteca/Model"
-	"biblioteca/View"
 )
 
-// AuthController conecta el modelo de gestión de usuarios con las vistas de login y menú principal.
+// AuthController se encarga exclusivamente de la lógica de autenticación y sesión de usuario.
 type AuthController struct {
-	userMgr  *model.UserManager
-	view     *view.LoginView
-	router   *view.AppRouter
-	mainMenu *view.MainMenuView
+	userMgr *model.UserManager
 }
 
-// NewAuthController crea un nuevo controlador de autenticación e instala los listeners de eventos.
-func NewAuthController(userMgr *model.UserManager, loginView *view.LoginView, router *view.AppRouter, mainMenu *view.MainMenuView) *AuthController {
-	ctrl := &AuthController{
-		userMgr:  userMgr,
-		view:     loginView,
-		router:   router,
-		mainMenu: mainMenu,
+// NewAuthController inicializa el controlador de autenticación con el gestor de usuarios.
+func NewAuthController(userMgr *model.UserManager) *AuthController {
+	return &AuthController{
+		userMgr: userMgr,
 	}
-
-	// Escuchar evento de intento de login en la vista
-	ctrl.view.SetOnLogin(func(u, p string) {
-		ctrl.SubmitLogin(u, p)
-	})
-
-	// Escuchar evento de salir en la vista de login
-	ctrl.view.SetOnExit(func() {
-		ctrl.Salir()
-	})
-
-	// Escuchar evento de selección en el menú principal
-	if ctrl.mainMenu != nil {
-		ctrl.mainMenu.SetOnSelect(func(opc string) {
-			if opc == "Cerrar Sesión" {
-				ctrl.CerrarSesion()
-			} else {
-				ctrl.router.MostrarModalError("El módulo [" + opc + "] está en desarrollo.")
-			}
-		})
-	}
-
-	return ctrl
 }
 
-// SubmitLogin valida las credenciales recibidas y actualiza la navegación.
-func (ac *AuthController) SubmitLogin(u, p string) {
-	if u == "" || p == "" {
-		ac.view.MostrarError("Por favor ingrese usuario y contraseña.")
-		return
-	}
-
-	user, err := ac.userMgr.Autenticar(u, p)
-	if err != nil {
-		ac.view.MostrarError(err.Error())
-		return
-	}
-
-	// Limpiar mensaje de error si fue exitoso
-	ac.view.MostrarError("")
-
-	// Actualizar menú con información del usuario autenticado y conmutar pantalla
-	if ac.mainMenu != nil {
-		ac.mainMenu.ActualizarInfoUsuario(user.Username, user.Rol)
-	}
-
-	ac.router.CambiarPantalla("main_menu")
+// Autenticar valida el usuario y contraseña delegando al UserManager.
+func (ac *AuthController) Autenticar(username, password string) (*model.Usuario, error) {
+	return ac.userMgr.Autenticar(username, password)
 }
 
-// CerrarSesion quita la sesión activa en el modelo, resetea la vista de login y redirige al login.
+// CerrarSesion quita la referencia del usuario de la sesión activa.
 func (ac *AuthController) CerrarSesion() {
 	ac.userMgr.CerrarSesion()
-	ac.view.LimpiarCampos()
-	ac.router.CambiarPantalla("login")
 }
 
-// Salir finaliza la ejecución de la aplicación.
-func (ac *AuthController) Salir() {
-	ac.router.Salir()
+// GetSesion obtiene el usuario actualmente autenticado en el sistema.
+func (ac *AuthController) GetSesion() *model.Usuario {
+	return ac.userMgr.GetSesion()
 }
