@@ -1,0 +1,99 @@
+package view
+
+import (
+	"github.com/gdamore/tcell/v2"
+	"github.com/rivo/tview"
+)
+
+// LoginView implementa la interfaz ComponentView para la pantalla de inicio de sesión con alto contraste.
+type LoginView struct {
+	form          *tview.Form
+	usernameField *tview.InputField
+	passwordField *tview.InputField
+	errorLabel    *tview.TextView
+	onLogin       func(u, p string)
+	onExit        func()
+	layout        *tview.Flex
+}
+
+// NewLoginView crea y construye la interfaz visual del Login con estilo de alto contraste.
+func NewLoginView() *LoginView {
+	lv := &LoginView{}
+
+	lv.usernameField = CrearCampoTexto("Usuario: ", 25)
+	lv.passwordField = CrearCampoPassword("Contraseña: ", 25)
+
+	lv.passwordField.SetDoneFunc(func(key tcell.Key) {
+		if key == tcell.KeyEnter && lv.onLogin != nil {
+			u, p := lv.ObtenerCredenciales()
+			lv.onLogin(u, p)
+		}
+	})
+
+	lv.errorLabel = tview.NewTextView().
+		SetTextColor(tcell.ColorRed).
+		SetTextAlign(tview.AlignCenter).
+		SetDynamicColors(true)
+
+	lv.form = tview.NewForm().
+		AddFormItem(lv.usernameField).
+		AddFormItem(lv.passwordField).
+		AddButton(" Iniciar Sesión ", func() {
+			if lv.onLogin != nil {
+				u, p := lv.ObtenerCredenciales()
+				lv.onLogin(u, p)
+			}
+		}).
+		AddButton(" Limpiar ", func() {
+			lv.LimpiarCampos()
+		}).
+		AddButton(" Salir ", func() {
+			if lv.onExit != nil {
+				lv.onExit()
+			}
+		})
+
+	EstilarFormulario(lv.form, " 🔒 Sistema Bibliotecario - Acceso ")
+
+	// Layout centrado en pantalla
+	lv.layout = CrearLayoutCentrado(lv.form, lv.errorLabel, 50, 11)
+
+	return lv
+}
+
+// ObtenerCredenciales retorna el usuario y contraseña ingresados en el formulario.
+func (lv *LoginView) ObtenerCredenciales() (string, string) {
+	return lv.usernameField.GetText(), lv.passwordField.GetText()
+}
+
+// MostrarError actualiza el mensaje de error en la vista con resaltado alto.
+func (lv *LoginView) MostrarError(msg string) {
+	if msg != "" {
+		lv.errorLabel.SetText("[red:][bold]❌ " + msg)
+	} else {
+		lv.errorLabel.SetText("")
+	}
+}
+
+// SetOnLogin asigna el callback para procesar la autenticación.
+func (lv *LoginView) SetOnLogin(fn func(u, p string)) {
+	lv.onLogin = fn
+}
+
+// SetOnExit asigna el callback para salir de la aplicación.
+func (lv *LoginView) SetOnExit(fn func()) {
+	lv.onExit = fn
+}
+
+// LimpiarCampos reinicia los campos de texto, errores y reestablece el foco inicial.
+func (lv *LoginView) LimpiarCampos() {
+	lv.usernameField.SetText("")
+	lv.passwordField.SetText("")
+	lv.errorLabel.SetText("")
+	lv.form.SetFocus(0)
+}
+
+// GetPrimitive retorna el elemento raíz tview de la vista.
+func (lv *LoginView) GetPrimitive() tview.Primitive {
+	return lv.layout
+}

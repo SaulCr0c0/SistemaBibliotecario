@@ -1,2 +1,38 @@
-planificacion.md
+# Binarios y ejecutables compilados
+*.exe
+*.exe.manifest
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+main
+biblioteca
+SistemaBiblioteca
 
+# Dependencias (opcional si usas Go Modules y prefieres no subir código de terceros)
+vendor/
+
+# Archivos de cobertura de pruebas
+*.cover
+*.mo
+coverage.txt
+
+# Configuración de IDEs y editores
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+*.elm~
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Variables de entorno y secretos local
+.env
+*.local
+
+# Archivos temporales del proyecto
+planificacion.md
