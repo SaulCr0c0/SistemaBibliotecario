@@ -24,97 +24,39 @@ type MaterialTableView struct {
 func NewMaterialTableView() *MaterialTableView {
 	mtv := &MaterialTableView{}
 
-	mtv.table = tview.NewTable().
-		SetBorders(true).
-		SetBordersColor(tcell.ColorTeal).
-		SetSelectable(true, false).
-		SetSelectedStyle(tcell.StyleDefault.Background(tcell.ColorBlue).Foreground(tcell.ColorYellow).Bold(true))
+	mtv.table = CrearTablaEstilizada(" 📖 Inventario de Materiales Bibliotecarios ")
 
-	mtv.table.SetBorder(true).
-		SetBorderColor(tcell.ColorTeal).
-		SetTitle(" 📖 Inventario de Materiales Bibliotecarios ").
-		SetTitleColor(tcell.ColorYellow).
-		SetTitleAlign(tview.AlignCenter)
-
-	btnNuevo := tview.NewButton(" [A] Agregar ").SetSelectedFunc(func() {
-		if mtv.onNuevo != nil {
-			mtv.onNuevo()
-		}
-	})
-
-	btnEditar := tview.NewButton(" [E] Editar ").SetSelectedFunc(func() {
-		if mtv.onEditar != nil {
-			id := mtv.ObtenerIDSeleccionado()
-			if id > 0 {
+	var inputCapture func(event *tcell.EventKey) *tcell.EventKey
+	mtv.buttons, inputCapture = CrearBarraAccionesTabla(
+		func() {
+			if mtv.onNuevo != nil {
+				mtv.onNuevo()
+			}
+		},
+		func(id int) {
+			if mtv.onEditar != nil {
 				mtv.onEditar(id)
 			}
-		}
-	})
-
-	btnEliminar := tview.NewButton(" [D] Eliminar ").SetSelectedFunc(func() {
-		if mtv.onEliminar != nil {
-			id := mtv.ObtenerIDSeleccionado()
-			if id > 0 {
+		},
+		func(id int) {
+			if mtv.onEliminar != nil {
 				mtv.onEliminar(id)
 			}
-		}
-	})
-
-	btnVolver := tview.NewButton(" [V] Volver ").SetSelectedFunc(func() {
-		if mtv.onVolver != nil {
-			mtv.onVolver()
-		}
-	})
-
-	for _, btn := range []*tview.Button{btnNuevo, btnEditar, btnEliminar, btnVolver} {
-		btn.SetStyle(tcell.StyleDefault.Background(tcell.ColorDarkBlue).Foreground(tcell.ColorYellow).Bold(true)).
-			SetActivatedStyle(tcell.StyleDefault.Background(tcell.ColorYellow).Foreground(tcell.ColorBlack).Bold(true))
-	}
-
-	mtv.buttons = tview.NewFlex().
-		SetDirection(tview.FlexColumn).
-		AddItem(btnNuevo, 0, 1, false).
-		AddItem(btnEditar, 0, 1, false).
-		AddItem(btnEliminar, 0, 1, false).
-		AddItem(btnVolver, 0, 1, false)
+		},
+		func() {
+			if mtv.onVolver != nil {
+				mtv.onVolver()
+			}
+		},
+		mtv.ObtenerIDSeleccionado,
+	)
 
 	mtv.layout = tview.NewFlex().
 		SetDirection(tview.FlexRow).
 		AddItem(mtv.table, 0, 1, true).
 		AddItem(mtv.buttons, 3, 1, false)
 
-	// Captura de teclas rápidas para acciones
-	mtv.layout.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-		switch event.Rune() {
-		case 'a', 'A':
-			if mtv.onNuevo != nil {
-				mtv.onNuevo()
-				return nil
-			}
-		case 'e', 'E':
-			if mtv.onEditar != nil {
-				id := mtv.ObtenerIDSeleccionado()
-				if id > 0 {
-					mtv.onEditar(id)
-				}
-				return nil
-			}
-		case 'd', 'D':
-			if mtv.onEliminar != nil {
-				id := mtv.ObtenerIDSeleccionado()
-				if id > 0 {
-					mtv.onEliminar(id)
-				}
-				return nil
-			}
-		case 'v', 'V':
-			if mtv.onVolver != nil {
-				mtv.onVolver()
-				return nil
-			}
-		}
-		return event
-	})
+	mtv.layout.SetInputCapture(inputCapture)
 
 	return mtv
 }
@@ -123,15 +65,7 @@ func NewMaterialTableView() *MaterialTableView {
 func (mtv *MaterialTableView) CargarMateriales(materiales []model.Prestable) {
 	mtv.table.Clear()
 
-	headers := []string{"ID", "Tipo", "Título", "Año", "Estado", "Máx Días", "Detalle Específico"}
-	for col, h := range headers {
-		cell := tview.NewTableCell(h).
-			SetTextColor(tcell.ColorYellow).
-			SetAttributes(tcell.AttrBold).
-			SetSelectable(false).
-			SetAlign(tview.AlignCenter)
-		mtv.table.SetCell(0, col, cell)
-	}
+	RenderizarEncabezadosTabla(mtv.table, []string{"ID", "Tipo", "Título", "Año", "Estado", "Máx Días", "Detalle Específico"})
 
 	for i, m := range materiales {
 		row := i + 1

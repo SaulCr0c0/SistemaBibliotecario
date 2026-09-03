@@ -30,59 +30,16 @@ type MaterialFormView struct {
 func NewMaterialFormView() *MaterialFormView {
 	mfv := &MaterialFormView{}
 
-	mfv.tipoDropDown = tview.NewDropDown().
-		SetLabel("Tipo de Material: ").
-		SetLabelColor(tcell.ColorYellow).
-		SetFieldBackgroundColor(tcell.ColorDarkBlue).
-		SetFieldTextColor(tcell.ColorWhite).
-		SetListStyles(
-			tcell.StyleDefault.Background(tcell.ColorDarkBlue).Foreground(tcell.ColorWhite),
-			tcell.StyleDefault.Background(tcell.ColorBlue).Foreground(tcell.ColorYellow).Bold(true),
-		).
-		SetOptions([]string{"Libro", "Tesis", "Revista"}, func(option string, optionIndex int) {
-			mfv.actualizarEtiquetasExtra(option)
-		}).
-		SetCurrentOption(0)
+	mfv.tituloField = CrearCampoTexto("Título: ", 30)
+	mfv.anioField = CrearCampoTexto("Año de Publicación: ", 10)
+	mfv.extra1Field = CrearCampoTexto("ISBN: ", 25)
+	mfv.extra2Field = CrearCampoTexto("Editorial: ", 25)
 
-	mfv.tituloField = tview.NewInputField().
-		SetLabel("Título: ").
-		SetLabelColor(tcell.ColorYellow).
-		SetFieldBackgroundColor(tcell.ColorDarkBlue).
-		SetFieldTextColor(tcell.ColorWhite).
-		SetFieldWidth(30)
+	mfv.tipoDropDown = CrearDesplegable("Tipo de Material: ", []string{"Libro", "Tesis", "Revista"}, func(option string, optionIndex int) {
+		mfv.actualizarEtiquetasExtra(option)
+	}).SetCurrentOption(0)
 
-	mfv.anioField = tview.NewInputField().
-		SetLabel("Año de Publicación: ").
-		SetLabelColor(tcell.ColorYellow).
-		SetFieldBackgroundColor(tcell.ColorDarkBlue).
-		SetFieldTextColor(tcell.ColorWhite).
-		SetFieldWidth(10)
-
-	mfv.disponField = tview.NewDropDown().
-		SetLabel("Estado: ").
-		SetLabelColor(tcell.ColorYellow).
-		SetFieldBackgroundColor(tcell.ColorDarkBlue).
-		SetFieldTextColor(tcell.ColorWhite).
-		SetListStyles(
-			tcell.StyleDefault.Background(tcell.ColorDarkBlue).Foreground(tcell.ColorWhite),
-			tcell.StyleDefault.Background(tcell.ColorBlue).Foreground(tcell.ColorYellow).Bold(true),
-		).
-		SetOptions([]string{"Disponible", "Prestado"}, nil).
-		SetCurrentOption(0)
-
-	mfv.extra1Field = tview.NewInputField().
-		SetLabel("ISBN: ").
-		SetLabelColor(tcell.ColorYellow).
-		SetFieldBackgroundColor(tcell.ColorDarkBlue).
-		SetFieldTextColor(tcell.ColorWhite).
-		SetFieldWidth(25)
-
-	mfv.extra2Field = tview.NewInputField().
-		SetLabel("Editorial: ").
-		SetLabelColor(tcell.ColorYellow).
-		SetFieldBackgroundColor(tcell.ColorDarkBlue).
-		SetFieldTextColor(tcell.ColorWhite).
-		SetFieldWidth(25)
+	mfv.disponField = CrearDesplegable("Estado: ", []string{"Disponible", "Prestado"}, nil).SetCurrentOption(0)
 
 	mfv.errorLabel = tview.NewTextView().
 		SetTextColor(tcell.ColorRed).
@@ -112,28 +69,8 @@ func NewMaterialFormView() *MaterialFormView {
 			}
 		})
 
-	mfv.form.SetButtonBackgroundColor(tcell.ColorBlue)
-	mfv.form.SetButtonTextColor(tcell.ColorYellow)
-	mfv.form.SetFieldBackgroundColor(tcell.ColorDarkBlue)
-	mfv.form.SetFieldTextColor(tcell.ColorWhite)
-	mfv.form.SetLabelColor(tcell.ColorYellow)
-
-	mfv.form.SetBorder(true)
-	mfv.form.SetBorderColor(tcell.ColorTeal)
-	mfv.form.SetTitle(" 📝 Formulario de Material Bibliotecario ")
-	mfv.form.SetTitleColor(tcell.ColorYellow)
-	mfv.form.SetTitleAlign(tview.AlignCenter)
-
-	mfv.layout = tview.NewFlex().
-		SetDirection(tview.FlexRow).
-		AddItem(nil, 0, 1, false).
-		AddItem(tview.NewFlex().SetDirection(tview.FlexColumn).
-			AddItem(nil, 0, 1, false).
-			AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
-				AddItem(mfv.form, 18, 1, true).
-				AddItem(mfv.errorLabel, 2, 1, false), 65, 1, true).
-			AddItem(nil, 0, 1, false), 20, 1, true).
-		AddItem(nil, 0, 1, false)
+	EstilarFormulario(mfv.form, " 📝 Formulario de Material Bibliotecario ")
+	mfv.layout = CrearLayoutCentrado(mfv.form, mfv.errorLabel, 65, 18)
 
 	return mfv
 }

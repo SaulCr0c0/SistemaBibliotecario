@@ -24,97 +24,39 @@ type UserTableView struct {
 func NewUserTableView() *UserTableView {
 	utv := &UserTableView{}
 
-	utv.table = tview.NewTable().
-		SetBorders(true).
-		SetBordersColor(tcell.ColorTeal).
-		SetSelectable(true, false).
-		SetSelectedStyle(tcell.StyleDefault.Background(tcell.ColorBlue).Foreground(tcell.ColorYellow).Bold(true))
+	utv.table = CrearTablaEstilizada(" 👤 Gestión de Usuarios - Administrador ")
 
-	utv.table.SetBorder(true).
-		SetBorderColor(tcell.ColorTeal).
-		SetTitle(" 👤 Gestión de Usuarios - Administrador ").
-		SetTitleColor(tcell.ColorYellow).
-		SetTitleAlign(tview.AlignCenter)
-
-	btnNuevo := tview.NewButton(" [[A]A] Agregar ").SetSelectedFunc(func() {
-		if utv.onNuevo != nil {
-			utv.onNuevo()
-		}
-	})
-
-	btnEditar := tview.NewButton(" [[E]E] Editar ").SetSelectedFunc(func() {
-		if utv.onEditar != nil {
-			id := utv.ObtenerIDSeleccionado()
-			if id > 0 {
+	var inputCapture func(event *tcell.EventKey) *tcell.EventKey
+	utv.buttons, inputCapture = CrearBarraAccionesTabla(
+		func() {
+			if utv.onNuevo != nil {
+				utv.onNuevo()
+			}
+		},
+		func(id int) {
+			if utv.onEditar != nil {
 				utv.onEditar(id)
 			}
-		}
-	})
-
-	btnEliminar := tview.NewButton(" [[D]D] Eliminar ").SetSelectedFunc(func() {
-		if utv.onEliminar != nil {
-			id := utv.ObtenerIDSeleccionado()
-			if id > 0 {
+		},
+		func(id int) {
+			if utv.onEliminar != nil {
 				utv.onEliminar(id)
 			}
-		}
-	})
-
-	btnVolver := tview.NewButton(" [[V]V] Volver ").SetSelectedFunc(func() {
-		if utv.onVolver != nil {
-			utv.onVolver()
-		}
-	})
-
-	for _, btn := range []*tview.Button{btnNuevo, btnEditar, btnEliminar, btnVolver} {
-		btn.SetStyle(tcell.StyleDefault.Background(tcell.ColorDarkBlue).Foreground(tcell.ColorYellow).Bold(true)).
-			SetActivatedStyle(tcell.StyleDefault.Background(tcell.ColorYellow).Foreground(tcell.ColorBlack).Bold(true))
-	}
-
-	utv.buttons = tview.NewFlex().
-		SetDirection(tview.FlexColumn).
-		AddItem(btnNuevo, 0, 1, false).
-		AddItem(btnEditar, 0, 1, false).
-		AddItem(btnEliminar, 0, 1, false).
-		AddItem(btnVolver, 0, 1, false)
+		},
+		func() {
+			if utv.onVolver != nil {
+				utv.onVolver()
+			}
+		},
+		utv.ObtenerIDSeleccionado,
+	)
 
 	utv.layout = tview.NewFlex().
 		SetDirection(tview.FlexRow).
 		AddItem(utv.table, 0, 1, true).
 		AddItem(utv.buttons, 3, 1, false)
 
-	// Captura de atajos de teclado
-	utv.layout.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-		switch event.Rune() {
-		case 'a', 'A':
-			if utv.onNuevo != nil {
-				utv.onNuevo()
-				return nil
-			}
-		case 'e', 'E':
-			if utv.onEditar != nil {
-				id := utv.ObtenerIDSeleccionado()
-				if id > 0 {
-					utv.onEditar(id)
-				}
-				return nil
-			}
-		case 'd', 'D':
-			if utv.onEliminar != nil {
-				id := utv.ObtenerIDSeleccionado()
-				if id > 0 {
-					utv.onEliminar(id)
-				}
-				return nil
-			}
-		case 'v', 'V':
-			if utv.onVolver != nil {
-				utv.onVolver()
-				return nil
-			}
-		}
-		return event
-	})
+	utv.layout.SetInputCapture(inputCapture)
 
 	return utv
 }
@@ -123,15 +65,7 @@ func NewUserTableView() *UserTableView {
 func (utv *UserTableView) CargarUsuarios(usuarios []*model.Usuario) {
 	utv.table.Clear()
 
-	headers := []string{"ID", "Nombre de Usuario", "Rol", "Detalle Específico"}
-	for col, h := range headers {
-		cell := tview.NewTableCell(h).
-			SetTextColor(tcell.ColorYellow).
-			SetAttributes(tcell.AttrBold).
-			SetSelectable(false).
-			SetAlign(tview.AlignCenter)
-		utv.table.SetCell(0, col, cell)
-	}
+	RenderizarEncabezadosTabla(utv.table, []string{"ID", "Nombre de Usuario", "Rol", "Detalle Específico"})
 
 	for i, u := range usuarios {
 		row := i + 1

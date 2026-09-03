@@ -20,20 +20,8 @@ type LoginView struct {
 func NewLoginView() *LoginView {
 	lv := &LoginView{}
 
-	lv.usernameField = tview.NewInputField().
-		SetLabel("Usuario: ").
-		SetLabelColor(tcell.ColorYellow).
-		SetFieldBackgroundColor(tcell.ColorDarkBlue).
-		SetFieldTextColor(tcell.ColorWhite).
-		SetFieldWidth(25)
-
-	lv.passwordField = tview.NewInputField().
-		SetLabel("Contraseña: ").
-		SetLabelColor(tcell.ColorYellow).
-		SetFieldBackgroundColor(tcell.ColorDarkBlue).
-		SetFieldTextColor(tcell.ColorWhite).
-		SetMaskCharacter('*').
-		SetFieldWidth(25)
+	lv.usernameField = CrearCampoTexto("Usuario: ", 25)
+	lv.passwordField = CrearCampoPassword("Contraseña: ", 25)
 
 	lv.passwordField.SetDoneFunc(func(key tcell.Key) {
 		if key == tcell.KeyEnter && lv.onLogin != nil {
@@ -65,29 +53,10 @@ func NewLoginView() *LoginView {
 			}
 		})
 
-	lv.form.SetButtonBackgroundColor(tcell.ColorBlue)
-	lv.form.SetButtonTextColor(tcell.ColorYellow)
-	lv.form.SetFieldBackgroundColor(tcell.ColorDarkBlue)
-	lv.form.SetFieldTextColor(tcell.ColorWhite)
-	lv.form.SetLabelColor(tcell.ColorYellow)
-
-	lv.form.SetBorder(true)
-	lv.form.SetBorderColor(tcell.ColorTeal)
-	lv.form.SetTitle(" 🔒 Sistema Bibliotecario - Acceso ")
-	lv.form.SetTitleColor(tcell.ColorYellow)
-	lv.form.SetTitleAlign(tview.AlignCenter)
+	EstilarFormulario(lv.form, " 🔒 Sistema Bibliotecario - Acceso ")
 
 	// Layout centrado en pantalla
-	lv.layout = tview.NewFlex().
-		SetDirection(tview.FlexRow).
-		AddItem(nil, 0, 1, false).
-		AddItem(tview.NewFlex().SetDirection(tview.FlexColumn).
-			AddItem(nil, 0, 1, false).
-			AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
-				AddItem(lv.form, 11, 1, true).
-				AddItem(lv.errorLabel, 2, 1, false), 50, 1, true).
-			AddItem(nil, 0, 1, false), 13, 1, true).
-		AddItem(nil, 0, 1, false)
+	lv.layout = CrearLayoutCentrado(lv.form, lv.errorLabel, 50, 11)
 
 	return lv
 }

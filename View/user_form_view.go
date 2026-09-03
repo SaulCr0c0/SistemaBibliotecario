@@ -27,50 +27,15 @@ type UserFormView struct {
 func NewUserFormView() *UserFormView {
 	ufv := &UserFormView{}
 
-	ufv.usernameField = tview.NewInputField().
-		SetLabel("Nombre de Usuario: ").
-		SetLabelColor(tcell.ColorYellow).
-		SetFieldBackgroundColor(tcell.ColorDarkBlue).
-		SetFieldTextColor(tcell.ColorWhite).
-		SetFieldWidth(25)
+	ufv.usernameField = CrearCampoTexto("Nombre de Usuario: ", 25)
+	ufv.passwordField = CrearCampoPassword("Contraseña: ", 25)
 
-	ufv.passwordField = tview.NewInputField().
-		SetLabel("Contraseña: ").
-		SetLabelColor(tcell.ColorYellow).
-		SetFieldBackgroundColor(tcell.ColorDarkBlue).
-		SetFieldTextColor(tcell.ColorWhite).
-		SetMaskCharacter('*').
-		SetFieldWidth(25)
+	ufv.rolDropDown = CrearDesplegable("Rol: ", []string{"Administrador", "Bibliotecario"}, func(option string, optionIndex int) {
+		ufv.actualizarVisibilidadCampos(option)
+	}).SetCurrentOption(0)
 
-	ufv.rolDropDown = tview.NewDropDown().
-		SetLabel("Rol: ").
-		SetLabelColor(tcell.ColorYellow).
-		SetFieldBackgroundColor(tcell.ColorDarkBlue).
-		SetFieldTextColor(tcell.ColorWhite).
-		SetListStyles(
-			tcell.StyleDefault.Background(tcell.ColorDarkBlue).Foreground(tcell.ColorWhite),
-			tcell.StyleDefault.Background(tcell.ColorBlue).Foreground(tcell.ColorYellow).Bold(true),
-		).
-		SetOptions([]string{"Administrador", "Bibliotecario"}, func(option string, optionIndex int) {
-			ufv.actualizarVisibilidadCampos(option)
-		}).
-		SetCurrentOption(0)
-
-	ufv.nivelAccesoField = tview.NewInputField().
-		SetLabel("Nivel de Acceso (1-10): ").
-		SetLabelColor(tcell.ColorYellow).
-		SetFieldBackgroundColor(tcell.ColorDarkBlue).
-		SetFieldTextColor(tcell.ColorWhite).
-		SetFieldWidth(10).
-		SetText("1")
-
-	ufv.turnoField = tview.NewInputField().
-		SetLabel("Turno (Mañana/Tarde/Noche): ").
-		SetLabelColor(tcell.ColorYellow).
-		SetFieldBackgroundColor(tcell.ColorDarkBlue).
-		SetFieldTextColor(tcell.ColorWhite).
-		SetFieldWidth(20).
-		SetText("Mañana")
+	ufv.nivelAccesoField = CrearCampoTexto("Nivel de Acceso (1-10): ", 10).SetText("1")
+	ufv.turnoField = CrearCampoTexto("Turno (Mañana/Tarde/Noche): ", 20).SetText("Mañana")
 
 	ufv.errorLabel = tview.NewTextView().
 		SetTextColor(tcell.ColorRed).
@@ -99,28 +64,8 @@ func NewUserFormView() *UserFormView {
 			}
 		})
 
-	ufv.form.SetButtonBackgroundColor(tcell.ColorBlue)
-	ufv.form.SetButtonTextColor(tcell.ColorYellow)
-	ufv.form.SetFieldBackgroundColor(tcell.ColorDarkBlue)
-	ufv.form.SetFieldTextColor(tcell.ColorWhite)
-	ufv.form.SetLabelColor(tcell.ColorYellow)
-
-	ufv.form.SetBorder(true)
-	ufv.form.SetBorderColor(tcell.ColorTeal)
-	ufv.form.SetTitle(" 📝 Formulario de Usuario ")
-	ufv.form.SetTitleColor(tcell.ColorYellow)
-	ufv.form.SetTitleAlign(tview.AlignCenter)
-
-	ufv.layout = tview.NewFlex().
-		SetDirection(tview.FlexRow).
-		AddItem(nil, 0, 1, false).
-		AddItem(tview.NewFlex().SetDirection(tview.FlexColumn).
-			AddItem(nil, 0, 1, false).
-			AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
-				AddItem(ufv.form, 16, 1, true).
-				AddItem(ufv.errorLabel, 2, 1, false), 60, 1, true).
-			AddItem(nil, 0, 1, false), 18, 1, true).
-		AddItem(nil, 0, 1, false)
+	EstilarFormulario(ufv.form, " 📝 Formulario de Usuario ")
+	ufv.layout = CrearLayoutCentrado(ufv.form, ufv.errorLabel, 60, 16)
 
 	return ufv
 }
