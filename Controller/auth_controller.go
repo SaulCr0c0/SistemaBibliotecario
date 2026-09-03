@@ -70,9 +70,10 @@ func (ac *AuthController) SubmitLogin(u, p string) {
 	ac.router.CambiarPantalla("main_menu")
 }
 
-// CerrarSesion quita la sesión activa en el modelo y redirige al login.
+// CerrarSesion quita la sesión activa en el modelo, resetea la vista de login y redirige al login.
 func (ac *AuthController) CerrarSesion() {
 	ac.userMgr.CerrarSesion()
+	ac.view.LimpiarCampos()
 	ac.router.CambiarPantalla("login")
 }
 

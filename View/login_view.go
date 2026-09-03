@@ -51,9 +51,7 @@ func NewLoginView() *LoginView {
 			}
 		}).
 		AddButton("Limpiar", func() {
-			lv.usernameField.SetText("")
-			lv.passwordField.SetText("")
-			lv.errorLabel.SetText("")
+			lv.LimpiarCampos()
 		}).
 		AddButton("Salir", func() {
 			if lv.onExit != nil {
@@ -98,6 +96,14 @@ func (lv *LoginView) SetOnLogin(fn func(u, p string)) {
 // SetOnExit asigna el callback para salir de la aplicación.
 func (lv *LoginView) SetOnExit(fn func()) {
 	lv.onExit = fn
+}
+
+// LimpiarCampos reinicia los campos de texto, errores y reestablece el foco inicial.
+func (lv *LoginView) LimpiarCampos() {
+	lv.usernameField.SetText("")
+	lv.passwordField.SetText("")
+	lv.errorLabel.SetText("")
+	lv.form.SetFocus(0)
 }
 
 // GetPrimitive retorna el elemento raíz tview de la vista.
