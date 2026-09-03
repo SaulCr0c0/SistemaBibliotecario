@@ -5,7 +5,7 @@ import (
 	"github.com/rivo/tview"
 )
 
-// LoginView implementa la interfaz ComponentView para la pantalla de inicio de sesión.
+// LoginView implementa la interfaz ComponentView para la pantalla de inicio de sesión con alto contraste.
 type LoginView struct {
 	form          *tview.Form
 	usernameField *tview.InputField
@@ -16,16 +16,22 @@ type LoginView struct {
 	layout        *tview.Flex
 }
 
-// NewLoginView crea y construye la interfaz visual del Login.
+// NewLoginView crea y construye la interfaz visual del Login con estilo de alto contraste.
 func NewLoginView() *LoginView {
 	lv := &LoginView{}
 
 	lv.usernameField = tview.NewInputField().
 		SetLabel("Usuario: ").
+		SetLabelColor(tcell.ColorYellow).
+		SetFieldBackgroundColor(tcell.ColorDarkBlue).
+		SetFieldTextColor(tcell.ColorWhite).
 		SetFieldWidth(25)
 
 	lv.passwordField = tview.NewInputField().
 		SetLabel("Contraseña: ").
+		SetLabelColor(tcell.ColorYellow).
+		SetFieldBackgroundColor(tcell.ColorDarkBlue).
+		SetFieldTextColor(tcell.ColorWhite).
 		SetMaskCharacter('*').
 		SetFieldWidth(25)
 
@@ -44,24 +50,32 @@ func NewLoginView() *LoginView {
 	lv.form = tview.NewForm().
 		AddFormItem(lv.usernameField).
 		AddFormItem(lv.passwordField).
-		AddButton("Iniciar Sesión", func() {
+		AddButton(" Iniciar Sesión ", func() {
 			if lv.onLogin != nil {
 				u, p := lv.ObtenerCredenciales()
 				lv.onLogin(u, p)
 			}
 		}).
-		AddButton("Limpiar", func() {
+		AddButton(" Limpiar ", func() {
 			lv.LimpiarCampos()
 		}).
-		AddButton("Salir", func() {
+		AddButton(" Salir ", func() {
 			if lv.onExit != nil {
 				lv.onExit()
 			}
 		})
 
-	lv.form.SetBorder(true).
-		SetTitle(" 🔒 Sistema Bibliotecario - Acceso ").
-		SetTitleAlign(tview.AlignCenter)
+	lv.form.SetButtonBackgroundColor(tcell.ColorBlue)
+	lv.form.SetButtonTextColor(tcell.ColorYellow)
+	lv.form.SetFieldBackgroundColor(tcell.ColorDarkBlue)
+	lv.form.SetFieldTextColor(tcell.ColorWhite)
+	lv.form.SetLabelColor(tcell.ColorYellow)
+
+	lv.form.SetBorder(true)
+	lv.form.SetBorderColor(tcell.ColorTeal)
+	lv.form.SetTitle(" 🔒 Sistema Bibliotecario - Acceso ")
+	lv.form.SetTitleColor(tcell.ColorYellow)
+	lv.form.SetTitleAlign(tview.AlignCenter)
 
 	// Layout centrado en pantalla
 	lv.layout = tview.NewFlex().
@@ -83,9 +97,13 @@ func (lv *LoginView) ObtenerCredenciales() (string, string) {
 	return lv.usernameField.GetText(), lv.passwordField.GetText()
 }
 
-// MostrarError actualiza el mensaje de error en la vista.
+// MostrarError actualiza el mensaje de error en la vista con resaltado alto.
 func (lv *LoginView) MostrarError(msg string) {
-	lv.errorLabel.SetText(msg)
+	if msg != "" {
+		lv.errorLabel.SetText("[red:][bold]❌ " + msg)
+	} else {
+		lv.errorLabel.SetText("")
+	}
 }
 
 // SetOnLogin asigna el callback para procesar la autenticación.
