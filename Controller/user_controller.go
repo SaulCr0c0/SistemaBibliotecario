@@ -1,8 +1,8 @@
 package controller
 
 import (
-	"biblioteca/Model"
-	"biblioteca/View"
+	model "biblioteca/Model"
+	view "biblioteca/View"
 )
 
 // UserController gestiona las acciones de la tabla y formulario de usuarios.

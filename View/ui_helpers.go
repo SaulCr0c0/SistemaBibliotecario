@@ -103,13 +103,13 @@ func CrearBarraAccionesTabla(
 	onVolver func(),
 	getIDSeleccionado func() int,
 ) (*tview.Flex, func(event *tcell.EventKey) *tcell.EventKey) {
-	btnNuevo := tview.NewButton(" [A] Agregar ").SetSelectedFunc(func() {
+	btnNuevo := tview.NewButton(" [[A]A] Agregar ").SetSelectedFunc(func() {
 		if onNuevo != nil {
 			onNuevo()
 		}
 	})
 
-	btnEditar := tview.NewButton(" [E] Editar ").SetSelectedFunc(func() {
+	btnEditar := tview.NewButton(" [[E]E] Editar ").SetSelectedFunc(func() {
 		if onEditar != nil {
 			id := getIDSeleccionado()
 			if id > 0 {
@@ -118,7 +118,7 @@ func CrearBarraAccionesTabla(
 		}
 	})
 
-	btnEliminar := tview.NewButton(" [D] Eliminar ").SetSelectedFunc(func() {
+	btnEliminar := tview.NewButton(" [[D]D] Eliminar ").SetSelectedFunc(func() {
 		if onEliminar != nil {
 			id := getIDSeleccionado()
 			if id > 0 {
@@ -127,7 +127,7 @@ func CrearBarraAccionesTabla(
 		}
 	})
 
-	btnVolver := tview.NewButton(" [V] Volver ").SetSelectedFunc(func() {
+	btnVolver := tview.NewButton(" [[V]V] Volver ").SetSelectedFunc(func() {
 		if onVolver != nil {
 			onVolver()
 		}
